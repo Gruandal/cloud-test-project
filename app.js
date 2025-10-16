@@ -128,15 +128,46 @@ function renderPending() {
 }
 
 function renderLog() {
-  const box = $('#log'); box.innerHTML = '';
+  const box = $('#log');
+  box.innerHTML = '';
   const data = logs().slice(-30).reverse();
-  if (data.length === 0) { box.innerHTML = '<div class="small">尚無紀錄</div>'; return }
+
+  if (data.length === 0) {
+    box.innerHTML = '<div class="small">尚無紀錄</div>';
+    return;
+  }
+
+  // 統計每個任務的完成次數
+  const countMap = {};
   data.forEach(x => {
-    const el = document.createElement('div'); el.className = 'item';
-    el.innerHTML = `<div><div>${x.t}</div><div class="meta">${x.c}｜${x.emotion}｜${fmtDate(x.ts)}</div></div>`;
+    countMap[x.t] = (countMap[x.t] || 0) + 1;
+  });
+
+  data.forEach(x => {
+    const el = document.createElement('div');
+    el.className = 'item';
+    const times = countMap[x.t]; // 該任務的總次數
+
+    el.innerHTML = `
+      <div>
+        <div><b>${x.t}</b> <span class="small">（已完成 ${times} 次）</span></div>
+        <div class="meta">${x.c}｜${x.emotion}｜${fmtDate(x.ts)}</div>
+      </div>
+      <div class="log-actions">
+        <button class="btn-fav">加入清單</button>
+      </div>
+    `;
+
+    // 「加入清單」功能
+    el.querySelector('.btn-fav').onclick = () => {
+      saveFav(x);
+      renderFavs();
+    };
+
     box.appendChild(el);
   });
 }
+
 
 function renderFavs() {
   const box = $('#favorites'); box.innerHTML = '';
