@@ -81,17 +81,11 @@ body{margin:0;background:var(--bg);font-family:"Noto Sans TC",sans-serif;color:v
 .result-title{font-weight:800;margin-bottom:6px}
 .result-meta{font-size:13px;color:var(--muted);margin-bottom:6px}
 .result-badge{display:inline-block;background:#111;color:#fff;font-size:12px;border-radius:999px;padding:4px 8px}
-.log-actions {
-  margin-top: 4px;
+#moodChart {
+  margin-top: 16px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 8px;
 }
-.log-actions .btn-fav {
-  background: #eee;
-  border: none;
-  border-radius: 8px;
-  padding: 4px 8px;
-  cursor: pointer;
-  font-size: 12px;
-}
-.log-actions .btn-fav:hover {
-  background: #ddd;
-}
+
