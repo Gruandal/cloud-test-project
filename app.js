@@ -34,23 +34,24 @@ $$('.emotions button').forEach(b => {
   });
 });
 
-const RESULT_HOLD_MS = 1500;
+// === 🎰 扭蛋動畫 (使用 Generator.json) ===
+const gachaAnim = lottie.loadAnimation({
+  container: document.getElementById('gachaAnim'),
+  renderer: 'svg',
+  loop: false,
+  autoplay: false,
+  path: 'Generator.json' // 與 index.html 同層
+});
 
 $('#spin').addEventListener('click', () => {
   if (!chosenEmotion) { alert("請先選擇心情！"); return; }
-  $('#loading').style.display = 'block';
-  $('#result').style.display = 'none';
 
-  let hints = ["扭蛋中...", "快出來吧小任務！", "命運正在轉動..."];
-  let i = 0;
-  const hintTimer = setInterval(() => {
-    $('#loading p').textContent = hints[i++ % hints.length];
-  }, 700);
+  // 播放扭蛋動畫
+  gachaAnim.goToAndPlay(0, true);
 
-  setTimeout(() => {
-    clearInterval(hintTimer);
+  gachaAnim.removeEventListener('complete');
+  gachaAnim.addEventListener('complete', () => {
     const x = pickTask(chosenEmotion);
-    $('#loading').style.display = 'none';
     $('#resultTitle').textContent = x.t;
     $('#resultDesc').textContent = x.d;
     $('#resultCat').textContent = x.c;
@@ -64,10 +65,11 @@ $('#spin').addEventListener('click', () => {
       chosenEmotion = null;
       $$('.emotions button').forEach(x => x.style.filter = 'none');
       updateAll();
-    }, RESULT_HOLD_MS);
-  }, 1200);
+    }, 1500);
+  });
 });
 
+// === 任務選取 ===
 function pickTask(emotion) {
   const pool = [...tasks];
   if (emotion === '壓力') pool.push({ t: "3 分鐘寫下困擾", d: "把腦中擔心的事寫下來。", c: "覺察" });
@@ -80,6 +82,7 @@ function pickTask(emotion) {
   return pick;
 }
 
+// === 儲存與讀取 ===
 function logs() { return JSON.parse(localStorage.getItem('mh.logs') || '[]') }
 function favs() { return JSON.parse(localStorage.getItem('mh.favs') || '[]') }
 function pendings() { return JSON.parse(localStorage.getItem('mh.pending') || '[]') }
@@ -104,6 +107,7 @@ function addPending(x) {
   renderPending();
 }
 
+// === 渲染區 ===
 function renderPending() {
   const box = $('#pendingTasks');
   const data = pendings();
@@ -128,12 +132,32 @@ function renderPending() {
 }
 
 function renderLog() {
-  const box = $('#log'); box.innerHTML = '';
+  const box = $('#log');
+  box.innerHTML = '';
   const data = logs().slice(-30).reverse();
-  if (data.length === 0) { box.innerHTML = '<div class="small">尚無紀錄</div>'; return }
+
+  if (data.length === 0) {
+    box.innerHTML = '<div class="small">尚無紀錄</div>';
+    return;
+  }
+
+  // 統計任務次數
+  const countMap = {};
+  data.forEach(x => { countMap[x.t] = (countMap[x.t] || 0) + 1; });
+
   data.forEach(x => {
-    const el = document.createElement('div'); el.className = 'item';
-    el.innerHTML = `<div><div>${x.t}</div><div class="meta">${x.c}｜${x.emotion}｜${fmtDate(x.ts)}</div></div>`;
+    const el = document.createElement('div');
+    el.className = 'item';
+    const times = countMap[x.t];
+    el.innerHTML = `
+      <div>
+        <div><b>${x.t}</b> <span class="small">（已完成 ${times} 次）</span></div>
+        <div class="meta">${x.c}｜${x.emotion}｜${fmtDate(x.ts)}</div>
+      </div>
+      <div class="log-actions">
+        <button class="btn-fav">加入清單</button>
+      </div>`;
+    el.querySelector('.btn-fav').onclick = () => { saveFav(x); renderFavs(); };
     box.appendChild(el);
   });
 }
@@ -209,6 +233,7 @@ function updateAll() {
   renderLog(); renderFavs(); renderPending(); summarizeWeek(); calcStreak();
 }
 
+// 清除資料
 const clearBtn = $('#clear');
 if (clearBtn) {
   clearBtn.addEventListener('click', () => {
@@ -219,35 +244,8 @@ if (clearBtn) {
     updateAll();
   });
 }
-// ==== Chart.js 視覺化統計 ====
-const ctx = document.getElementById('moodChart');
-if (ctx) {
-  if (window.moodChart) window.moodChart.destroy(); // 避免重複疊圖
-  window.moodChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['壓力', '焦慮', '開心'],
-      datasets: [{
-        label: '次數',
-        data: [reds, blues, yellows],
-        backgroundColor: ['#ff6b6b','#4dabf7','#ffd43b'],
-        borderRadius: 8
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { stepSize: 1 }
-        }
-      }
-    }
-  });
-}
 
-// 匯出紀錄功能
+// 匯出紀錄
 const exportBtn = document.createElement('button');
 exportBtn.className = 'btn ghost';
 exportBtn.id = 'export';
