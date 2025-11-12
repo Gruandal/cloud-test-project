@@ -40,7 +40,7 @@
             <div class="track"><div class="fill yellow" id="barYellow"></div></div>
           </div>
         </div>
-        <canvas id="moodChart" width="400" height="220"></canvas>
+
         <div class="footer">
           <div class="small" id="weekRange"></div>
           <button class="btn ghost" id="clear">清除資料</button>
@@ -74,6 +74,9 @@
         <button class="btn chip yellow" data-emotion="開心">黃 · 開心</button>
       </div>
 
+      <!-- 🎰 扭蛋動畫容器 -->
+      <div id="gachaAnim" style="width:300px; height:300px; margin:auto;"></div>
+
       <div class="spin">
         <button id="spin" class="btn primary lg">轉一下</button>
       </div>
@@ -91,7 +94,9 @@
     </div>
   </div>
 
+  <!-- Lottie -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+  <!-- App -->
   <script src="app.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
