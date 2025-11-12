@@ -9,8 +9,14 @@
 <body>
   <div id="homePage" class="container">
     <div class="header">
-      <div class="h1">心情卡片</div>
-      <div class="badge" id="streak">連續天數 0</div>
+      <div class="header-title">
+        <div class="h1">心情卡片</div>
+        <div class="badge" id="streak">連續天數 0</div>
+      </div>
+      <div class="user-info">
+        <span id="userEmail" class="user-email">🔐 </span>
+        <button class="btn logout-btn" onclick="logout()">登出</button>
+      </div>
     </div>
 
     <div class="pending-card">
@@ -74,6 +80,9 @@
         <button class="btn chip yellow" data-emotion="開心">黃 · 開心</button>
       </div>
 
+      <!-- 🎰 扭蛋動畫容器 -->
+      <div id="gachaAnim" style="width:300px; height:300px; margin:auto;"></div>
+
       <div class="spin">
         <button id="spin" class="btn primary lg">轉一下</button>
       </div>
@@ -91,6 +100,9 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <!-- Lottie -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+  <!-- App -->
+  <script type="module" src="app.js"></script>
 </body>
 </html>
